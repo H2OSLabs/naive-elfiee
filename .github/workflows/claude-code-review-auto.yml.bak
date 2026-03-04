@@ -1,0 +1,62 @@
+name: Claude Auto Review
+
+# Automatically review when PR is first opened
+on:
+  pull_request:
+    types: [opened]  # Only when PR is created, not on every commit
+
+jobs:
+  claude-review:
+    # Optional: Only auto-review for certain contributors
+    # Uncomment and customize as needed:
+    # if: |
+    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' ||
+    #   github.event.pull_request.user.login == 'junior-developer'
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    # Prevent multiple concurrent reviews
+    concurrency:
+      group: claude-auto-review-pr-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+            PR TITLE: ${{ github.event.pull_request.title }}
+            PR AUTHOR: @${{ github.event.pull_request.user.login }}
+
+            This is an automatic initial review for a newly opened pull request.
+
+            Please review this pull request and provide feedback on:
+            - Code quality and best practices
+            - Potential bugs or issues
+            - Performance considerations
+            - Security concerns
+            - Test coverage
+
+            Use the repository's CLAUDE.md for guidance on style and conventions.
+            Be constructive and helpful in your feedback.
+
+            Note: The PR author can request additional reviews by commenting "@Claude" on the PR.
+
+            Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
+
+          # Allow Claude to use GitHub CLI commands for PR interaction
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'

@@ -1,0 +1,29 @@
+# Next-step guidance rules used by GuideGenerator (phase 2.5 baseline data)
+#
+# Each entry maps an analyzer category to a human-readable suggestion.
+
+steps:
+  todo_marker:
+    priority: 1
+    message: "Replace the todo!() marker with the actual implementation logic."
+  payload_field_missing:
+    priority: 1
+    message: "Add the missing field to the payload struct and rerun the tests."
+  payload_deserialize_error:
+    priority: 1
+    message: "确认 payload 结构与 JSON 示例一致，补全缺失字段或类型。"
+  payload_example_missing:
+    priority: 1
+    message: "在 tests.rs 中补全示例 JSON，使其匹配 Payload 结构。"
+  missing_block:
+    priority: 2
+    message: "此能力需要 block，检查 command 是否传入有效的 block_id。"
+  authorization_error:
+    priority: 2
+    message: "授予必要的 capability 或调整 CBAC 规则。"
+  handler_not_implemented:
+    priority: 1
+    message: "实现 handler 逻辑，替换 todo!() 并返回正确事件。"
+  workflow_test_todo:
+    priority: 3
+    message: "完成 workflow 测试步骤，或在实现前临时使用 #[ignore]。"

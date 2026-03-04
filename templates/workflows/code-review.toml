@@ -1,0 +1,53 @@
+# Code Review Socialware Template
+# 标准代码审查 Socialware 声明 — 由 elf run 解析
+
+[socialware]
+name = "Code Review"
+namespace = "code-review"
+description = "Two-agent code review workflow: coder writes, reviewer reviews"
+
+[[roles]]
+id = "coder"
+agent_type = "openclaw"
+capabilities = [
+    "document.write",
+    "document.read",
+    "session.append",
+    "session.read",
+    "task.write",
+    "task.read",
+    "task.commit",
+    "core.create",
+    "core.link",
+    "core.unlink",
+    "core.delete",
+]
+
+[[roles]]
+id = "reviewer"
+agent_type = "openclaw"
+capabilities = [
+    "document.read",
+    "session.append",
+    "session.read",
+    "task.read",
+    "task.write",
+    "core.create",
+    "core.link",
+]
+
+# Passthrough 声明 — Elfiee 不解析，由 Coordinator 读取
+# 示例（取消注释启用）：
+#
+# [[flows]]
+# id = "cr:review_lifecycle"
+# subject = "task"
+# [[flows.transitions]]
+# from = "pending"
+# action = "task.commit"
+# to = "submitted"
+#
+# [[commitments]]
+# id = "cr:review_sla"
+# between = ["cr:coder", "cr:reviewer"]
+# obligation = "Reviewer must respond within 24h of submission"

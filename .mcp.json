@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "context7": {
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      },
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "elfiee": {
+      "type": "sse",
+      "url": "http://localhost:47200/sse"
+    },
+    "shadcn": {
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ],
+      "command": "npx"
+    }
+  }
+}

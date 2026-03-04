@@ -1,0 +1,47 @@
+[package]
+name = "elfiee-ext-gen"
+version = "0.1.0"
+edition = "2021"
+authors = ["Elfiee Team"]
+description = "Code generator for Elfiee extensions with TDD support"
+license = "Apache-2.0"
+
+[[bin]]
+name = "elfiee-ext-gen"
+path = "src/main.rs"
+
+[dependencies]
+# CLI framework
+clap = { version = "4", features = ["derive"] }
+
+# Template engine
+tera = "1"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+
+# Regular expressions
+regex = "1"
+
+# File operations
+walkdir = "2"
+
+# AST parsing
+syn = { version = "2", features = ["full", "visit"] }
+
+# Terminal UI
+colored = "2"
+
+# Error handling
+anyhow = "1"
+thiserror = "1"
+
+[dev-dependencies]
+# CLI testing
+assert_cmd = "2"
+predicates = "3"
+
+# Temporary files for testing
+tempfile = "3"

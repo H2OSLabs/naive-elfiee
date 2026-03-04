@@ -1,0 +1,28 @@
+{
+  "lspServers": {
+    "rust": {
+      "command": "rust-analyzer",
+      "args": [],
+      "extensionToLanguage": {
+        ".rs": "rust"
+      },
+      "settings": {
+        "rust-analyzer": {
+          "checkOnSave": {
+            "command": "clippy"
+          },
+          "cargo": {
+            "allFeatures": true
+          },
+          "procMacro": {
+            "enable": true
+          }
+        }
+      },
+      "transport": "stdio",
+      "workspaceFolder": "${CLAUDE_PROJECT_DIR}",
+      "restartOnCrash": true,
+      "startupTimeout": 60000
+    }
+  }
+}

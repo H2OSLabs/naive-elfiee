@@ -1,0 +1,64 @@
+# Elfiee file type mappings
+# This file maps file extensions to elf block types.
+# Only extensions listed here will be recognized; unlisted extensions
+# fall back to "document" block type.
+#
+# Format:
+#   [block_type]
+#   .ext1
+#   .ext2
+#
+# 重构后统一使用 [document] 类型（合并原 [markdown] 和 [code]）。
+# block_type 只有 3 种：document, task, session。
+# 文件格式通过 Document Block 的 format 字段区分（md/rs/py 等）。
+
+[document]
+# Markdown
+.md
+.markdown
+# Rust
+.rs
+# Python
+.py
+# JavaScript / TypeScript
+.js
+.ts
+.jsx
+.tsx
+# C / C++
+.c
+.cpp
+.h
+.hpp
+# JVM
+.java
+.kt
+.scala
+# Other languages
+.go
+.rb
+.php
+.swift
+.cs
+# Data / Config
+.json
+.toml
+.yaml
+.yml
+.xml
+.ini
+.conf
+# Shell
+.sh
+.bash
+.zsh
+.fish
+# Web
+.html
+.htm
+.css
+.scss
+.sass
+.less
+# Database
+.sql

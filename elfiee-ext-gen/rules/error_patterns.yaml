@@ -1,0 +1,47 @@
+# Error patterns for test failure analysis
+# Used by TestAnalyzer to match test failures and provide hints
+
+patterns:
+  - pattern: 'not yet implemented: (.+)'
+    category: todo_marker
+    hint: "Remove the todo!() marker and implement the functionality"
+
+  - pattern: 'missing field `(\w+)`'
+    category: payload_field_missing
+    hint: "Add the missing field to the Payload struct definition"
+
+  - pattern: 'Failed to deserialize payload: (.+)'
+    category: payload_deserialize_error
+    hint: "Check that the payload structure matches the expected schema"
+
+  - pattern: 'Payload should deserialize successfully'
+    category: payload_example_missing
+    hint: "Update the payload example in tests.rs to match the fields defined in mod.rs"
+
+  - pattern: 'Block required for (.+)'
+    category: missing_block
+    hint: "This capability requires a block to operate on"
+
+  - pattern: 'Authorization failed'
+    category: authorization_error
+    hint: "Check CBAC grants - ensure the editor has the required capability grant"
+
+  - pattern: 'Handler should execute successfully'
+    category: handler_not_implemented
+    hint: "Replace the todo!() in the handler with real logic and return the expected events"
+
+  - pattern: 'Implement complete workflow test with multiple capability interactions'
+    category: workflow_test_todo
+    hint: "Either implement the workflow interactions or temporarily mark the test with #[ignore] until ready"
+
+  - pattern: 'cannot find (type|struct|enum) `?([\w:]+)`? in this scope'
+    category: missing_type
+    hint: "Import the missing type or ensure it is declared in the current module"
+
+  - pattern: 'expected (.+), found (.+)'
+    category: type_mismatch
+    hint: "Verify the handler returns the correct type and that event payloads use the expected structures"
+
+  - pattern: 'cannot move out of .* which is behind a (?:mutable )?reference'
+    category: ownership_error
+    hint: "Clone the data or adjust the borrowing so you do not move out of a borrowed reference"

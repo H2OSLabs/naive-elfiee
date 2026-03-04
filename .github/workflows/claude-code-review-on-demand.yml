@@ -1,0 +1,93 @@
+name: Claude On-Demand Review
+
+# Trigger when someone comments on a PR with @Claude
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude-review:
+    # Only run on PR comments that mention @Claude
+    if: |
+      github.event.issue.pull_request &&
+      (contains(github.event.comment.body, '@Claude') ||
+       contains(github.event.comment.body, '@claude'))
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    # Prevent multiple concurrent reviews for the same PR
+    concurrency:
+      group: claude-review-pr-${{ github.event.issue.number }}
+      cancel-in-progress: true
+
+    steps:
+      - name: React to comment with eyes emoji
+        run: |
+          gh api \
+            --method POST \
+            repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
+            -f content='eyes'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          # Checkout the PR head ref
+          ref: refs/pull/${{ github.event.issue.number }}/head
+          fetch-depth: 0
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.issue.number }}
+
+            Triggered by: @${{ github.event.comment.user.login }}
+            User comment: "${{ github.event.comment.body }}"
+
+            Please review this pull request and provide feedback on:
+            - Code quality and best practices
+            - Potential bugs or issues
+            - Performance considerations
+            - Security concerns
+            - Test coverage
+
+            Use the repository's CLAUDE.md for guidance on style and conventions.
+            Be constructive and helpful in your feedback.
+
+            If the user's comment specifies particular concerns (e.g., "check performance" or "security review"),
+            focus on those areas.
+
+            Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
+
+          # Allow Claude to use GitHub CLI commands for PR interaction
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
+
+      - name: React with thumbs up on success
+        if: success()
+        run: |
+          gh api \
+            --method POST \
+            repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
+            -f content='+1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: React with confused on failure
+        if: failure()
+        run: |
+          gh api \
+            --method POST \
+            repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
+            -f content='confused'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

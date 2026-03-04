@@ -1,0 +1,46 @@
+# 通用测试依赖规则 - 基于命名模式
+#
+# 这些规则适用于任何 extension，通过正则匹配测试名称推断依赖关系。
+# Analyzer 会根据测试名称自动应用这些模式，而不是硬编码具体测试名。
+
+dependency_patterns:
+  # 规则1: workflow/integration 测试依赖所有 basic 功能测试
+  # 示例匹配: test_full_workflow_add_toggle_remove, test_workflow_create_render
+  - test_pattern: "test_(full_)?workflow.*"
+    depends_on_pattern: "test_.*_basic"
+    reason: "Workflow tests require basic operations to work first"
+
+  # 规则2: update/modify 操作依赖 create/add 操作
+  # 示例匹配: test_update_item, test_modify_content, test_edit_title
+  - test_pattern: "test_.*(update|modify|edit).*"
+    depends_on_pattern: "test_.*(create|add).*"
+    reason: "Update operations require items to exist first"
+
+  # 规则3: delete/remove 操作依赖 create/add 操作
+  # 示例匹配: test_delete_item, test_remove_block, test_clear_all
+  - test_pattern: "test_.*(delete|remove|clear).*"
+    depends_on_pattern: "test_.*(create|add).*"
+    reason: "Delete operations require items to exist first"
+
+  # 规则4: toggle/complete/state change 操作依赖 create/add 操作
+  # 示例匹配: test_toggle_item, test_complete_task, test_check_status
+  - test_pattern: "test_.*(toggle|complete|check|mark).*"
+    depends_on_pattern: "test_.*(create|add).*"
+    reason: "State changes require items to exist first"
+
+  # 规则5: authorization 测试可以与功能测试并行（无依赖）
+  # 示例匹配: test_authorization_owner, test_auth_non_owner_with_grant
+  - test_pattern: "test_.*authorization.*"
+    depends_on_pattern: null
+    reason: "Authorization tests are independent and can run in parallel"
+
+  # 规则6: payload 反序列化测试优先级最高（无依赖）
+  # 示例匹配: test_payload_deserialize, test_payload_wrong_structure
+  - test_pattern: "test_.*payload.*"
+    depends_on_pattern: null
+    reason: "Payload tests are foundational and should be fixed first"
+
+# 用户自定义规则说明（未开发）：
+# 如果某个 extension 需要特殊的依赖规则，可以在 extension 目录下创建：
+#   src-tauri/src/extensions/<extension_name>/test_dependencies.yaml
+# 该文件会与全局规则合并，extension 特定规则优先级更高。
