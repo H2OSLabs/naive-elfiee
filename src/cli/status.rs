@@ -15,8 +15,7 @@ pub async fn run(project: &str) -> Result<(), String> {
         ));
     }
 
-    let project_path = project_path
-        .canonicalize()
+    let project_path = crate::utils::safe_canonicalize(project_path)
         .map_err(|e| format!("Failed to resolve path: {}", e))?;
 
     let elf_project = ElfProject::open(&project_path)?;

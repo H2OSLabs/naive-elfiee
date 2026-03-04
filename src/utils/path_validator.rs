@@ -16,8 +16,7 @@ pub fn is_safe_path(path: &Path) -> Result<(), String> {
 
     // 2. Resolve path to check against forbidden directories
 
-    let canonical = path
-        .canonicalize()
+    let canonical = super::safe_canonicalize(path)
         .map_err(|e| format!("Invalid path: {}", e))?;
 
     // 3. Reject system sensitive directories

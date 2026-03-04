@@ -6,8 +6,7 @@ use std::path::Path;
 
 /// 执行 `elf block list`
 pub async fn list(project: &str) -> Result<(), String> {
-    let project_dir = Path::new(project)
-        .canonicalize()
+    let project_dir = crate::utils::safe_canonicalize(Path::new(project))
         .map_err(|e| format!("Failed to resolve project path: {}", e))?;
 
     if !project_dir.join(".elf").exists() {
@@ -54,8 +53,7 @@ pub async fn list(project: &str) -> Result<(), String> {
 ///
 /// 查看单个 block 的详细信息（支持 name 或 id）
 pub async fn get(project: &str, block: &str) -> Result<(), String> {
-    let project_dir = Path::new(project)
-        .canonicalize()
+    let project_dir = crate::utils::safe_canonicalize(Path::new(project))
         .map_err(|e| format!("Failed to resolve project path: {}", e))?;
 
     if !project_dir.join(".elf").exists() {

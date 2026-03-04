@@ -14,8 +14,7 @@ pub async fn run(project: &str) -> Result<(), String> {
             .map_err(|e| format!("Failed to create project directory: {}", e))?;
     }
 
-    let project_dir = project_dir
-        .canonicalize()
+    let project_dir = crate::utils::safe_canonicalize(project_dir)
         .map_err(|e| format!("Failed to resolve project path: {}", e))?;
 
     // 检查是否已初始化

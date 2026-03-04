@@ -11,8 +11,7 @@ use std::path::Path;
 ///
 /// 列出所有事件，按 CBAC 过滤（editor events 不过滤，block events 按 read 权限过滤）
 pub async fn list(project: &str) -> Result<(), String> {
-    let project_dir = Path::new(project)
-        .canonicalize()
+    let project_dir = crate::utils::safe_canonicalize(Path::new(project))
         .map_err(|e| format!("Failed to resolve project path: {}", e))?;
 
     if !project_dir.join(".elf").exists() {
@@ -74,8 +73,7 @@ pub async fn list(project: &str) -> Result<(), String> {
 ///
 /// 查询指定 block 的事件历史，支持 name/id 双模解析
 pub async fn history(project: &str, block: &str) -> Result<(), String> {
-    let project_dir = Path::new(project)
-        .canonicalize()
+    let project_dir = crate::utils::safe_canonicalize(Path::new(project))
         .map_err(|e| format!("Failed to resolve project path: {}", e))?;
 
     if !project_dir.join(".elf").exists() {
@@ -129,8 +127,7 @@ pub async fn history(project: &str, block: &str) -> Result<(), String> {
 ///
 /// 时间旅行：获取指定 event 时刻的 block 状态快照
 pub async fn at(project: &str, block: &str, event_id: &str) -> Result<(), String> {
-    let project_dir = Path::new(project)
-        .canonicalize()
+    let project_dir = crate::utils::safe_canonicalize(Path::new(project))
         .map_err(|e| format!("Failed to resolve project path: {}", e))?;
 
     if !project_dir.join(".elf").exists() {

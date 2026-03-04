@@ -73,8 +73,7 @@ pub async fn run(template_name: &str, project: &str, port: u16) -> Result<(), St
         super::init::run(project).await?;
     }
 
-    let project_dir = project_dir
-        .canonicalize()
+    let project_dir = crate::utils::safe_canonicalize(&project_dir)
         .map_err(|e| format!("Failed to resolve project path: {}", e))?;
     let project_str = project_dir.to_str().unwrap();
 

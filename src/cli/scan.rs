@@ -162,8 +162,7 @@ pub async fn create_blocks_for_files(
 /// - 无参数：批量扫描全部文件，新文件创建 block + 写内容，已有文件更新内容
 /// - 指定文件：单文件同步，找到 block 则更新，没有则创建
 pub async fn run(project: &str, file: Option<&str>) -> Result<(), String> {
-    let project_dir = Path::new(project)
-        .canonicalize()
+    let project_dir = crate::utils::safe_canonicalize(Path::new(project))
         .map_err(|e| format!("Failed to resolve project path: {}", e))?;
 
     if !project_dir.join(".elf").exists() {
@@ -199,8 +198,7 @@ async fn run_single_file(
     // 计算相对路径
     let abs_path = project_dir.join(file_path);
     let abs_path = if abs_path.exists() {
-        abs_path
-            .canonicalize()
+        crate::utils::safe_canonicalize(&abs_path)
             .map_err(|e| format!("Failed to resolve file path: {}", e))?
     } else {
         return Err(format!("File not found: {}", file_path));

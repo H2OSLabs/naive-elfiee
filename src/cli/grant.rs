@@ -13,8 +13,7 @@ pub async fn run(
     capability: &str,
     block: &str,
 ) -> Result<(), String> {
-    let project_dir = Path::new(project)
-        .canonicalize()
+    let project_dir = crate::utils::safe_canonicalize(Path::new(project))
         .map_err(|e| format!("Failed to resolve project path: {}", e))?;
 
     if !project_dir.join(".elf").exists() {

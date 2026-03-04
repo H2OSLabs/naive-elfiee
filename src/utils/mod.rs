@@ -5,6 +5,23 @@ pub mod path_validator;
 /// This module provides common utility functions used throughout the application.
 pub mod time;
 
+/// Cross-platform canonicalize that strips the `\\?\` prefix on Windows.
+///
+/// `std::fs::canonicalize()` on Windows returns extended-length paths like
+/// `\\?\C:\Users\...` which break URL parsers (SQLite connection strings),
+/// `strip_prefix` comparisons, and some file APIs.
+pub fn safe_canonicalize(path: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
+    let canonical = std::fs::canonicalize(path)?;
+    #[cfg(windows)]
+    {
+        let s = canonical.to_string_lossy();
+        if let Some(stripped) = s.strip_prefix(r"\\?\") {
+            return Ok(std::path::PathBuf::from(stripped));
+        }
+    }
+    Ok(canonical)
+}
+
 // Re-export ONLY the single primary public API
 // All other functions are internal (pub(crate)) to enforce consistent time format usage
 pub use time::{

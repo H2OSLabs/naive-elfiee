@@ -61,8 +61,7 @@ pub async fn run_with_caps(
     capabilities: &[&str],
     port: u16,
 ) -> Result<String, String> {
-    let project_dir = Path::new(project)
-        .canonicalize()
+    let project_dir = crate::utils::safe_canonicalize(Path::new(project))
         .map_err(|e| format!("Failed to resolve project path: {}", e))?;
 
     // 打开项目
@@ -138,8 +137,7 @@ pub async fn run_with_grants(
     grants: &[GrantEntry],
     port: u16,
 ) -> Result<String, String> {
-    let project_dir = Path::new(project)
-        .canonicalize()
+    let project_dir = crate::utils::safe_canonicalize(Path::new(project))
         .map_err(|e| format!("Failed to resolve project path: {}", e))?;
 
     // 打开项目
