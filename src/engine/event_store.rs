@@ -1,5 +1,5 @@
 use crate::models::{Event, EventMode};
-use sqlx::sqlite::{SqlitePool, SqlitePoolOptions};
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePool, SqlitePoolOptions};
 use sqlx::Row;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -32,24 +32,22 @@ impl EventStore {
     ///
     /// Returns an EventPoolWithPath containing both the pool and db_path.
     pub async fn create(path: &str) -> Result<EventPoolWithPath, sqlx::Error> {
-        let connection_string = if path == ":memory:" {
-            "sqlite::memory:".to_string()
+        let options = if path == ":memory:" {
+            SqliteConnectOptions::from_str("sqlite::memory:")?
         } else {
             // Ensure parent directory exists
             if let Some(parent) = std::path::Path::new(path).parent() {
                 std::fs::create_dir_all(parent).map_err(sqlx::Error::Io)?;
             }
 
-            // Use sqlite: prefix for file paths
-            format!("sqlite://{}", path)
-        };
+            // Use filename() to avoid URL-parsing issues with Windows paths
+            SqliteConnectOptions::new().filename(path)
+        }
+        .create_if_missing(true);
 
         let pool = SqlitePoolOptions::new()
             .max_connections(5)
-            .connect_with(
-                sqlx::sqlite::SqliteConnectOptions::from_str(&connection_string)?
-                    .create_if_missing(true),
-            )
+            .connect_with(options)
             .await?;
 
         // Initialize schema

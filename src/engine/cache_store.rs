@@ -1,4 +1,4 @@
-use sqlx::sqlite::{SqlitePool, SqlitePoolOptions};
+use sqlx::sqlite::{SqliteConnectOptions, SqlitePool, SqlitePoolOptions};
 use sqlx::Row;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -18,21 +18,20 @@ pub struct CacheStore;
 impl CacheStore {
     /// 创建或打开缓存数据库，初始化 schema。
     pub async fn create(path: &str) -> Result<SqlitePool, sqlx::Error> {
-        let connection_string = if path == ":memory:" {
-            "sqlite::memory:".to_string()
+        let options = if path == ":memory:" {
+            SqliteConnectOptions::from_str("sqlite::memory:")?
         } else {
             if let Some(parent) = Path::new(path).parent() {
                 std::fs::create_dir_all(parent).map_err(sqlx::Error::Io)?;
             }
-            format!("sqlite://{}", path)
-        };
+            // Use filename() to avoid URL-parsing issues with Windows paths
+            SqliteConnectOptions::new().filename(path)
+        }
+        .create_if_missing(true);
 
         let pool = SqlitePoolOptions::new()
             .max_connections(2)
-            .connect_with(
-                sqlx::sqlite::SqliteConnectOptions::from_str(&connection_string)?
-                    .create_if_missing(true),
-            )
+            .connect_with(options)
             .await?;
 
         Self::init_schema(&pool).await?;
